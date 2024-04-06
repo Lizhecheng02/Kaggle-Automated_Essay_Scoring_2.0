@@ -1,0 +1,7 @@
+scikit-learn
+datasets
+pandas
+transformers
+sentencepiece
+wandb
+accelerate
