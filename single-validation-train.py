@@ -29,13 +29,16 @@ def train_deberta(args):
 
     X = df_train[["essay_id", "full_text", "score"]]
     y = df_train[["labels"]]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=args.test_size, stratify=y)
+    X_train, X_eval, y_train, y_eval = train_test_split(X, y, test_size=args.test_size, stratify=y)
+
     df_train = pd.concat([X_train, y_train], axis=1)
     df_train.reset_index(drop=True, inplace=True)
     print(df_train["labels"].value_counts())
-    df_eval = pd.concat([X_test, y_test], axis=1)
+
+    df_eval = pd.concat([X_eval, y_eval], axis=1)
     df_eval.reset_index(drop=True, inplace=True)
     print(df_eval["labels"].value_counts())
+    
     ds_train = Dataset.from_pandas(df_train)
     ds_eval = Dataset.from_pandas(df_eval)
 
