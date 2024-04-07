@@ -32,8 +32,8 @@ def train_deberta(args):
     skf = StratifiedKFold(n_splits=args.fold_num, random_state=args.random_state, shuffle=True)
     for fold_id, (train_index, val_index) in enumerate(skf.split(X, y)):
         print(f"... Fold {fold_id} ...")
-        X_train, X_eval = X[train_index], X[val_index]
-        y_train, y_eval = y[train_index], y[val_index]
+        X_train, X_eval = X.iloc[train_index], X.iloc[val_index]
+        y_train, y_eval = y.iloc[train_index], y.iloc[val_index]
 
         df_train = pd.concat([X_train, y_train], axis=1)
         df_train.reset_index(drop=True, inplace=True)
@@ -149,6 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("--train_file_path", default="dataset/train.csv", type=str)
     parser.add_argument("--random_state", default=2024, type=int)
     parser.add_argument("--fold_num", default=5, type=int)
+    # parser.add_argument("--select_fold", default=[1, 2, 3, 4, 5], type=list)
     parser.add_argument("--model_name", default="microsoft/deberta-v3-large", type=str)
     parser.add_argument("--max_length", default=1024, type=int)
     parser.add_argument("--learning_rate", default=2e-5, type=float)
