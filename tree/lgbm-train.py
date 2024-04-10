@@ -275,7 +275,8 @@ kappa = cohen_kappa_score(
 print("Acc:", acc)
 print("Kappa:", kappa)
 
-prediction = X_test[["essay_id"]].copy()
+reloaded_test = pd.read_csv("../dataset/train.csv")
+prediction = reloaded_test[["essay_id"]].copy()
 prediction["score"] = 0
 pred_test = models[0].predict(X_test[feature_names]) + a
 for i in range(4):
