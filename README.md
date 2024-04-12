@@ -19,7 +19,7 @@ export KAGGLE_KEY="your_api_key"
 
 #### 2. Download Dataset
 ```bash
-cd datasets
+cd dataset
 kaggle competitions download -c learning-agency-lab-automated-essay-scoring-2
 unzip learning-agency-lab-automated-essay-scoring-2.zip
 ```
