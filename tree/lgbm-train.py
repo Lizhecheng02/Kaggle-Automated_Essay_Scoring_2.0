@@ -88,8 +88,9 @@ vectorizer = TfidfVectorizer(
     preprocessor=dummy,
     token_pattern=None,
     strip_accents="unicode",
-    min_df=2,
-    max_features=500
+    min_df=0.05,
+    max_df=0.95,
+    max_features=1000
 )
 
 vectorizer.fit(tokenized_texts_test)
@@ -106,7 +107,9 @@ vectorizer = TfidfVectorizer(
     preprocessor=dummy,
     token_pattern=None,
     strip_accents="unicode",
-    max_features=500
+    min_df=0.05,
+    max_df=0.95,
+    max_features=1000
 )
 
 X_train = vectorizer.fit_transform(tokenized_texts_train)
@@ -221,19 +224,19 @@ feature_names = list(filter(lambda x: x not in ["score"], X_train.columns))
 
 skf = StratifiedKFold(n_splits=5, random_state=42, shuffle=True)
 callbacks = [
-    log_evaluation(period=25),
-    early_stopping(stopping_rounds=75, first_metric_only=True)
+    log_evaluation(period=50),
+    early_stopping(stopping_rounds=500, first_metric_only=True)
 ]
 for fold_id, (train_idx, val_idx) in tqdm(enumerate(skf.split(X.copy(), y.copy().astype(str))), total=5):
     model = lgb.LGBMRegressor(
         objective=qwk_obj,
         metrics="None",
-        learning_rate=0.01,
+        learning_rate=0.005,
         n_estimators=10000,
-        max_depth=7,
-        num_leaves=10,
-        reg_alpha=0.4,
-        reg_lambda=0.7,
+        max_depth=17,
+        num_leaves=15,
+        reg_alpha=0.2,
+        reg_lambda=0.8,
         colsample_bytree=0.7,
         random_state=42,
         verbosity=-1
