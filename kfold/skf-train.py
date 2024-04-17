@@ -152,7 +152,7 @@ if __name__ == "__main__":
     # parser.add_argument("--select_fold", default=[1, 2, 3, 4, 5], type=list)
     parser.add_argument("--model_name", default="microsoft/deberta-v3-large", type=str)
     parser.add_argument("--max_length", default=1024, type=int)
-    parser.add_argument("--learning_rate", default=2e-5, type=float)
+    parser.add_argument("--learning_rate", default=6e-6, type=float)
     parser.add_argument("--num_train_epochs", default=3, type=int)
     parser.add_argument("--per_device_train_batch_size", default=1, type=int)
     parser.add_argument("--per_device_eval_batch_size", default=1, type=int)
