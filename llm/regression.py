@@ -56,7 +56,8 @@ def train(args):
     print(tokenizer.padding_side, tokenizer.pad_token)
 
     df = pd.read_csv(TRAIN_FILE)
-    df["labels"] = df.score.map(lambda x: x - 1)
+    df["labels"] = df.score.map(lambda x: x)
+    df["labels"] = df["labels"].astype(float)
     X = df[["essay_id", "full_text", "score"]]
     y = df[["labels"]]
 
