@@ -101,7 +101,7 @@ def train(args):
         bnb_4bit_use_double_quant=True,
         bnb_4bit_compute_dtype=torch.float16
     )
-    config = AutoConfig.from_pretrained(MODEL_NAME)
+    config = AutoConfig.from_pretrained(MODEL_NAME, token=ACCESS_TOKEN)
     config.attention_probs_dropout_prob = 0.0
     config.hidden_dropout_prob = 0.0
     config.num_labels = 1
