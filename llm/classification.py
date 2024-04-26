@@ -76,12 +76,8 @@ def train(args):
             ds_eval = Dataset.from_pandas(df_eval)
             print(ds_eval)
 
-            ds_train = ds_train.map(tokenize).remove_columns(
-                ["essay_id", "full_text", "score"]
-            )
-            ds_eval = ds_eval.map(tokenize).remove_columns(
-                ["essay_id", "full_text", "score"]
-            )
+            ds_train = ds_train.map(tokenize).remove_columns(["essay_id", "full_text", "score"])
+            ds_eval = ds_eval.map(tokenize).remove_columns(["essay_id", "full_text", "score"])
 
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -191,9 +187,7 @@ def train(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Finetune LLM For Sequence Classification"
-    )
+    parser = argparse.ArgumentParser(description="Finetune LLM For Sequence Classification")
     parser.add_argument("--train_file", default="../dataset/train.csv", type=str)
     parser.add_argument("--model_name", default="google/gemma-2b", type=str)
     parser.add_argument("--max_length", default=1536, type=int)
