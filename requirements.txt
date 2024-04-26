@@ -5,3 +5,6 @@ transformers
 sentencepiece
 wandb
 accelerate
+bitsandbytes
+peft
+hf_transfer
