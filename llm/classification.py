@@ -31,7 +31,8 @@ class CustomTrainer(Trainer):
         logits = outputs.logits
         loss_fct = nn.CrossEntropyLoss(
             weight=torch.tensor(
-                [self.label_weights[i] for i in range(len(self.label_weights))]
+                [self.label_weights[i] for i in range(len(self.label_weights))],
+                device=model.device
             )
         )
         loss = loss_fct(
@@ -105,7 +106,14 @@ def train(args):
                 ["essay_id", "full_text", "score"]
             )
 
-    label_weights = {0: 2.0, 1: 1.0, 2: 0.5, 3: 0.5, 4: 1.0, 5: 2.0}
+    label_counts = df["labels"].value_counts()
+    label_weights = {}
+    for label in range(6):
+        if label in label_counts:
+            label_weights[label] = 1 / label_counts[label] * len(df_train)
+        else:
+            label_weights[label] = 0
+    print(label_weights)
 
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
