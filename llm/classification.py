@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import torch
+import torch.nn as nn
 import argparse
 from transformers import (
     AutoModelForSequenceClassification,
@@ -17,6 +18,27 @@ from sklearn.model_selection import StratifiedKFold
 from datasets import Dataset
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
+
+
+class CustomTrainer(Trainer):
+    def __init__(self, *args, label_weights=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.label_weights = label_weights
+
+    def compute_loss(self, model, inputs, return_outputs=False):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        loss_fct = nn.CrossEntropyLoss(
+            weight=torch.tensor(
+                [self.label_weights[i] for i in range(len(self.label_weights))]
+            )
+        )
+        loss = loss_fct(
+            logits.view(-1, self.model.config.num_labels),
+            labels.view(-1)
+        )
+        return (loss, outputs) if return_outputs else loss
 
 
 def train(args):
@@ -76,8 +98,14 @@ def train(args):
             ds_eval = Dataset.from_pandas(df_eval)
             print(ds_eval)
 
-            ds_train = ds_train.map(tokenize).remove_columns(["essay_id", "full_text", "score"])
-            ds_eval = ds_eval.map(tokenize).remove_columns(["essay_id", "full_text", "score"])
+            ds_train = ds_train.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+            ds_eval = ds_eval.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+
+    label_weights = {0: 2.0, 1: 1.0, 2: 0.5, 3: 0.5, 4: 1.0, 5: 2.0}
 
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -172,14 +200,15 @@ def train(args):
         report_to="none"
     )
 
-    trainer = Trainer(
+    trainer = CustomTrainer(
         model=lora_model,
         args=training_args,
         train_dataset=ds_train,
         eval_dataset=ds_eval,
         tokenizer=tokenizer,
         data_collator=DataCollator(),
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        label_weights=label_weights
     )
 
     trainer.train()
