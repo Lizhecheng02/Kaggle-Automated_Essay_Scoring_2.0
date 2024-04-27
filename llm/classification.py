@@ -4,6 +4,7 @@ import os
 import torch
 import torch.nn as nn
 import argparse
+import warnings
 from transformers import (
     AutoModelForSequenceClassification,
     BitsAndBytesConfig,
@@ -16,6 +17,7 @@ from sklearn.metrics import cohen_kappa_score
 from peft import prepare_model_for_kbit_training, LoraConfig, TaskType, get_peft_model
 from sklearn.model_selection import StratifiedKFold
 from datasets import Dataset
+warnings.filterwarnings("ignore")
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 
