@@ -184,7 +184,7 @@ def train(args):
         return {"qwk": score}
 
     training_args = TrainingArguments(
-        output_dir=f"output_{MODEL_NAME.split("/")[-1]}/Fold{FOLD_ID}",
+        output_dir=f"output_{MODEL_NAME.split('/')[-1]}/Fold{FOLD_ID}",
         bf16=True if torch.cuda.is_bf16_supported() else False,
         fp16=False if torch.cuda.is_bf16_supported() else True,
         learning_rate=LEARNING_RATE,
