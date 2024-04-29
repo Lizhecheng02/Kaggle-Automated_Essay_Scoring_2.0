@@ -1,2 +1,4 @@
 **/.ipynb_checkpoints
 **/*.csv
+.DS_Store
+.history
