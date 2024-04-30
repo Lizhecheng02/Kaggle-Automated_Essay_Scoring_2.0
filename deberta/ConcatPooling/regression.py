@@ -63,7 +63,7 @@ def train(args):
             self.fc = nn.Linear(self.pool.output_dim, 1)
 
         def forward(self, inputs):
-            outputs = self.backbone(**inputs)
+            outputs = self.backbone(**inputs, output_hidden_states=True)
             feature = self.pool(inputs, outputs)
             output = self.fc(feature)
 
