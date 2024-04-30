@@ -13,7 +13,7 @@ from transformers import (
     get_polynomial_decay_schedule_with_warmup
 )
 import pandas as pd
-import torch.functional as F
+import torch.nn.functional as F
 import numpy as np
 import torch.nn as nn
 import torch
