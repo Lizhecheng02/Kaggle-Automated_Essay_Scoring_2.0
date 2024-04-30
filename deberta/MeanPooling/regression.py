@@ -221,7 +221,7 @@ def train(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Finetune LLM For Sequence Classification")
-    parser.add_argument("--train_file", default="../dataset/train.csv", type=str)
+    parser.add_argument("--train_file", default="../../dataset/train.csv", type=str)
     parser.add_argument("--model_name", default="microsoft/deberta-v3-large", type=str)
     parser.add_argument("--max_length", default=1536, type=int)
     parser.add_argument("--num_split", default=5, type=int)
