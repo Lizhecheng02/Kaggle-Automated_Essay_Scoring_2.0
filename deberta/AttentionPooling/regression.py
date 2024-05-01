@@ -13,6 +13,7 @@ from transformers import (
     get_polynomial_decay_schedule_with_warmup
 )
 import pandas as pd
+import torch.nn.functional as F
 import numpy as np
 import torch.nn as nn
 import torch
@@ -41,20 +42,37 @@ def get_attention_mask(inputs):
 
 
 def train(args):
-    class MaxPooling(nn.Module):
-        def __init__(self):
-            super(MaxPooling, self).__init__()
-            self.feat_mult = 1
-            self.output_dim = AutoConfig.from_pretrained(args.model_name).hidden_size
+    class AttentionPooling(nn.Module):
+        def __init__(self, hiddendim_fc, dropout):
+            super(AttentionPooling, self).__init__()
+            self.num_hidden_layers = AutoConfig.from_pretrained(args.model_name).num_hidden_layers
+            self.hidden_size = AutoConfig.from_pretrained(args.model_name).hidden_size
+            self.hiddendim_fc = hiddendim_fc
+            self.dropout = nn.Dropout(dropout)
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+            q_t = np.random.normal(loc=0.0, scale=0.1, size=(1, self.hidden_size))
+            self.q = nn.Parameter(torch.from_numpy(q_t)).float().to(self.device)
+            w_ht = np.random.normal(loc=0.0, scale=0.1, size=(self.hidden_size, self.hiddendim_fc))
+            self.w_h = nn.Parameter(torch.from_numpy(w_ht)).float().to(self.device)
+
+            self.output_dim = self.hiddendim_fc
+
+        def attention(self, h):
+            v = torch.matmul(self.q, h.transpose(-2, -1)).squeeze(1)
+            v = F.softmax(v, -1)
+            v_temp = torch.matmul(v.unsqueeze(1), h).transpose(-2, -1)
+            v = torch.matmul(self.w_h.transpose(1, 0), v_temp).squeeze(2)
+            return v
 
         def forward(self, inputs, backbone_outputs):
-            attention_mask = get_attention_mask(inputs)
-            x = get_input_ids(inputs)
-            input_mask_expanded = attention_mask.unsqueeze(-1).expand(x.size()).float()
-            embeddings = x.clone()
-            embeddings[input_mask_expanded == 0] = -1e4
-            max_embeddings, _ = torch.max(embeddings, dim=1)
-            return max_embeddings
+            all_hidden_states = get_all_hidden_states(backbone_outputs)
+            hidden_states = torch.stack([all_hidden_states[layer_i][:, 0].squeeze() for layer_i in range(1, self.num_hidden_layers + 1)], dim=-1)
+            hidden_states = hidden_states.view(-1, self.num_hidden_layers, self.hidden_size)
+            out = self.attention(hidden_states)
+            out = self.dropout(out)
+            return out
+
 
     class CustomModel(nn.Module):
         def __init__(self, tokenizer):
@@ -62,7 +80,7 @@ def train(args):
             self.backbone = AutoModel.from_pretrained(args.model_name)
             print(self.backbone)
             self.backbone.resize_token_embeddings(len(tokenizer))
-            self.pool = MaxPooling()
+            self.pool = AttentionPooling(hiddendim_fc=args.hiddendim_fc, dropout=args.dropout)
             self.fc = nn.Linear(self.pool.output_dim, 1)
 
         def forward(self, inputs):
@@ -222,6 +240,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Finetune LLM For Sequence Classification")
     parser.add_argument("--train_file", default="../../dataset/train.csv", type=str)
     parser.add_argument("--model_name", default="microsoft/deberta-v3-large", type=str)
+    parser.add_argument("--hiddendim_fc", default=512, type=int)
+    parser.add_argument("--dropout", default=0.1, type=float)
     parser.add_argument("--max_length", default=1536, type=int)
     parser.add_argument("--num_split", default=5, type=int)
     parser.add_argument("--fold_id", default=0, type=int)
