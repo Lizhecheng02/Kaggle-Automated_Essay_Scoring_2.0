@@ -2,4 +2,4 @@
 **/*.csv
 .DS_Store
 .history
-nohup.out
+**/*.out
