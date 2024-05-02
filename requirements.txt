@@ -1,7 +1,7 @@
 scikit-learn
 datasets
 pandas
-transformers
+transformers==4.40.1
 sentencepiece
 wandb
 accelerate
