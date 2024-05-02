@@ -358,6 +358,13 @@ def train(args):
             weights="quadratic"
         )
         return {"qwk": score}
+    
+    wandb.login(key="c465dd55c08ec111e077cf0454ba111b3a764a78")
+    run = wandb.init(
+        project=f"{args.model_name.split('/')[-1]}-awp",
+        job_type="training",
+        anonymous="allow"
+    )
 
     training_args = TrainingArguments(
         output_dir=f"output_{args.model_name.split('/')[-1]}/Fold{args.fold_id}",
@@ -380,7 +387,7 @@ def train(args):
         metric_for_best_model="qwk",
         greater_is_better=True,
         save_only_model=True,
-        report_to="none",
+        report_to="wandb",
         remove_unused_columns=False,
         label_names=["labels"]
     )
