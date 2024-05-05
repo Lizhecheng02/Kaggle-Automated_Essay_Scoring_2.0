@@ -1,5 +1,5 @@
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
 # import warnings
 # warnings.simplefilter('ignore')
 
@@ -16,29 +16,30 @@ from tokenizers import AddedToken
 
 USE_REGRESSION = True
 
-VER=1
+VER=3
 
-LOAD_FROM = True
+LOAD_FROM = None
 
 COMPUTE_CV = True
 
 
 class PATHS:
-    train_path = '../dataset/train.csv'
+    train_path = '../dataset/4k_nooverlap.csv'
     test_path = '../dataset/test.csv'
     submission_path = '../dataset/sample_submission.csv'
-    model_dir = '/root/autodl-tmp/microsoft/'
+    model_dir = '/ai/users/bst/competition/model/microsoft/'
     model_name = 'deberta-v3-large'
     model_path = model_dir + model_name
+    output_dir = '/ai/users/bst/competition/output_v{VER}'
 
 class CFG:
-    n_splits = 5
+    n_splits = 10
     seed = 42
-    max_length = 1024
+    max_length = 1536
     lr = 1e-5
-    train_batch_size = 2
-    eval_batch_size = 4
-    gradient_accumulation_steps = 2
+    train_batch_size = 1
+    eval_batch_size = 1
+    gradient_accumulation_steps = 4
     train_epochs = 4
     weight_decay = 0.01
     warmup_ratio = 0.05
@@ -128,7 +129,7 @@ for i, (_, val_index) in enumerate(skf.split(data, data["score"])):
 
 
 training_args = TrainingArguments(
-    output_dir=f'/root/autodl-tmp/output_v{VER}',
+    output_dir=PATHS.output_dir,
     fp16=True,
     learning_rate=CFG.lr,
     per_device_train_batch_size=CFG.train_batch_size,
@@ -176,7 +177,7 @@ if COMPUTE_CV:
         else: config.num_labels = CFG.num_labels 
 
         if LOAD_FROM:
-            model = AutoModelForSequenceClassification.from_pretrained( f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+            model = AutoModelForSequenceClassification.from_pretrained( f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
         else:
             model = AutoModelForSequenceClassification.from_pretrained(PATHS.model_path, config=config)
             model.resize_token_embeddings(len(tokenizer))
@@ -212,8 +213,8 @@ if COMPUTE_CV:
 
         # SAVE FOLD MODEL AND TOKENIZER
         if LOAD_FROM is None:
-            trainer.save_model(f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
-            tokenizer.save_pretrained(f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+            trainer.save_model(f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+            tokenizer.save_pretrained(f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
 
         # SAVE OOF PREDICTIONS
         if USE_REGRESSION: 
@@ -250,17 +251,17 @@ for fold in range(CFG.n_splits):
     
     # LOAD TOKENIZER
     if LOAD_FROM:
-        tokenizer = AutoTokenizer.from_pretrained( f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+        tokenizer = AutoTokenizer.from_pretrained( f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
     else:
-        tokenizer = AutoTokenizer.from_pretrained(f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+        tokenizer = AutoTokenizer.from_pretrained(f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
     tokenize = Tokenize(test, test, tokenizer)
     tokenized_test, _, _ = tokenize()
 
     # LOAD MODEL
     if LOAD_FROM:
-        model = AutoModelForSequenceClassification.from_pretrained( f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+        model = AutoModelForSequenceClassification.from_pretrained( f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
     else:
-        model = AutoModelForSequenceClassification.from_pretrained(f'/root/autodl-tmp/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
+        model = AutoModelForSequenceClassification.from_pretrained(f'/ai/users/bst/competition/outputs/{PATHS.model_name}_AES2_fold_{fold}_v{VER}')
     
     # INFER WITH TRAINER
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
