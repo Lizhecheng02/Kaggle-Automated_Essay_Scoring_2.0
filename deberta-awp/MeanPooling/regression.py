@@ -100,9 +100,12 @@ def train(args):
             return mean_embeddings
 
     class CustomModel(nn.Module):
-        def __init__(self, tokenizer):
+        def __init__(self, tokenizer, zero_dropout=True):
             super().__init__()
             self.backbone = AutoModel.from_pretrained(args.model_name)
+            if zero_dropout:
+                self.backbone.attention_probs_dropout_prob = 0.0
+                self.backbone.hidden_dropout_prob = 0.0
             print(self.backbone)
             self.backbone.resize_token_embeddings(len(tokenizer))
             self.pool = MeanPooling()
