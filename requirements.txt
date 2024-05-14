@@ -3,7 +3,7 @@ datasets
 pandas
 transformers==4.40.1
 sentencepiece
-wandb
+wandb==0.16.6
 accelerate
 bitsandbytes
 peft
