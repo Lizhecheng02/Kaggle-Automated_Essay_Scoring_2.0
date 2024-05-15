@@ -6,11 +6,17 @@ from config import CFG
 from preprocess import essay_preprocess
 from vectorizers import *
 from essay_processor import EssayProcessor
-from lgbm_train import train_lgbm
+from lgbm_train import train_lgbm_out_of_fold
 warnings.filterwarnings("ignore")
 
-train = pd.read_csv(CFG.train_file_path)
-train = train[:1000]
+train_main = pd.read_csv(CFG.main_file_path)
+train_main = train_main[:1000]
+
+train_out_of_fold = pd.read_csv(CFG.out_of_fold_file_path)
+train_out_of_fold = train_out_of_fold[:1000]
+
+train = pd.concat([train_main, train_out_of_fold], axis=0, ignore_index=True)
+
 test = pd.read_csv(CFG.test_file_path)
 
 if CFG.DO_PREPROCESS:
@@ -91,6 +97,12 @@ print(has_null_test)
 print("The shape of final train is:", train.shape)
 print("The shape of final test is:", test.shape)
 
+X_train_main = train[:len(train_main)]
+X_train_out_of_fold = train[len(train_main):]
+
+print("The shape of final X_train_main is:", X_train_main.shape)
+print("The shape of final X_train_out_of_fold is:", X_train_out_of_fold.shape)
+
 gc.collect()
 
-lgbm_models, lgbm_model_nums, lgbm_predictions = train_lgbm(X_train=train, X_test=test)
+lgbm_models, lgbm_model_nums, lgbm_predictions = train_lgbm_out_of_fold(X_train_main=X_train_main, X_train_out_of_fold=X_train_out_of_fold, X_test=test)

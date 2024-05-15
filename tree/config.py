@@ -1,6 +1,16 @@
 class CFG:
     random_state = 3047
 
+    # train file path
+    train_file_path = "../dataset/train.csv"
+
+    # test file path
+    test_file_path = "../dataset/test.csv"
+
+    # use out of fold cv
+    main_file_path = "../dataset/13k_overlap.csv"
+    out_of_fold_file_path = "../dataset/4k_nooverlap.csv"
+
     # whether to preprocess text
     DO_PREPROCESS = False
     word_file_path = "words.txt"
