@@ -27,6 +27,9 @@ class CFG:
     # whether to use essay processor
     USE_EssayProcessor = True
 
+    # whether to use feedback features
+    USE_FEEDBACK_FEATURES = True
+
     # train own tokenizer
     LOWER_CASE = False
     VOCAB_SIZE = 32000

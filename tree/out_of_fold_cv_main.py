@@ -84,6 +84,14 @@ if CFG.USE_ORIGINAL_COUNT_VECTORIZER:
     test = pd.merge(test, df_test, on="essay_id", how="left")
     print("The shape of test after using original count vectorizer is:", test.shape)
 
+if CFG.USE_FEEDBACK_FEATURES:
+    feedback_df_train = pd.read_csv("../dataset/train_feedback_features.csv")
+    train = pd.merge(train, feedback_df_train, on="essay_id", how="left")
+    print("The shape of train after using feedback features is:", train.shape)
+    feedback_df_test = pd.read_csv("../dataset/test_feedback_features.csv")
+    test = pd.merge(test, feedback_df_test, on="essay_id", how="left")
+    print("The shape of test after using feedback features is:", test.shape)
+
 train.drop(["essay_id", "full_text"], axis=1, inplace=True)
 train.fillna(0.0, inplace=True)
 has_null_train = train.isnull().values.any()

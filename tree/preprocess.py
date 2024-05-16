@@ -3,12 +3,12 @@ import re
 import string
 from config import CFG
 
+nlp = spacy.load("en_core_web_sm")
+with open(CFG.word_file_path, "r") as file:
+    english_vocab = set(word.strip().lower() for word in file)
+
 
 def count_spelling_errors(text):
-    nlp = spacy.load("en_core_web_sm")
-    with open(CFG.word_file_path, "r") as file:
-        english_vocab = set(word.strip().lower() for word in file)
-
     doc = nlp(text)
     lemmatized_tokens = [token.lemma_.lower() for token in doc]
     spelling_errors = sum(1 for token in lemmatized_tokens if token not in english_vocab)
@@ -41,7 +41,7 @@ cList = {
     "would've": "would have", "wouldn't": "would not",
     "wouldn't've": "would not have", "y'all": "you all", "y'alls": "you alls", "y'all'd": "you all would",
     "y'all'd've": "you all would have", "y'all're": "you all are", "y'all've": "you all have", "you'd": "you had",
-    "you'd've": "you would have", "you'll": "you you will", "you'll've": "you you will have", "you're": "you are",  "you've": "you have"
+    "you'd've": "you would have", "you'll": "you will", "you'll've": "you will have", "you're": "you are",  "you've": "you have"
 }
 
 c_re = re.compile('(%s)' % '|'.join(cList.keys()))
