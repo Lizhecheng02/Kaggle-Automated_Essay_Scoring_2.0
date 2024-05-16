@@ -8,3 +8,5 @@ accelerate
 bitsandbytes
 peft
 hf_transfer
+spacy
+lightgbm
