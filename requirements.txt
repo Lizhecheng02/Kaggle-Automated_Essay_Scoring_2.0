@@ -10,3 +10,4 @@ peft
 hf_transfer
 spacy
 lightgbm
+kaggle
