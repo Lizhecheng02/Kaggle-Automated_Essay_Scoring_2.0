@@ -155,6 +155,56 @@ def only17k(is_replace, num_split, selected_fold_id, backbone_model, max_length)
             )
 
             return tokenizer, ds_train, ds_eval
+        
+
+def only19k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
+    df = pd.read_csv("../dataset/19k_same_distribution.csv")
+    tokenizer = AutoTokenizer.from_pretrained(backbone_model)
+
+    if is_replace:
+        df["full_text"] = df["full_text"].str.replace(
+            r'\n\n', "[PARAGRAPH]", regex=True
+        )
+        tokenizer.add_special_tokens(
+            {"additional_special_tokens": ["[PARAGRAPH]"]}
+        )
+
+    df["labels"] = df.score.map(lambda x: x)
+    df["labels"] = df["labels"].astype(float)
+    X = df[["essay_id", "full_text", "score"]]
+    y = df[["labels"]]
+
+    skf = StratifiedKFold(n_splits=num_split, random_state=3047, shuffle=True)
+    print(len(tokenizer))
+
+    def tokenize(sample):
+        return tokenizer(sample["full_text"], max_length=max_length, truncation=True)
+
+    for fold_id, (train_index, val_index) in enumerate(skf.split(X, y)):
+        if fold_id == selected_fold_id:
+            print(f"... Fold {fold_id} ...")
+            X_train, X_eval = X.iloc[train_index], X.iloc[val_index]
+            y_train, y_eval = y.iloc[train_index], y.iloc[val_index]
+
+            df_train = pd.concat([X_train, y_train], axis=1)
+            df_train.reset_index(drop=True, inplace=True)
+            print(df_train["labels"].value_counts())
+
+            df_eval = pd.concat([X_eval, y_eval], axis=1)
+            df_eval.reset_index(drop=True, inplace=True)
+            print(df_eval["labels"].value_counts())
+
+            ds_train = Dataset.from_pandas(df_train)
+            ds_eval = Dataset.from_pandas(df_eval)
+
+            ds_train = ds_train.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+            ds_eval = ds_eval.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+
+            return tokenizer, ds_train, ds_eval
 
 
 def only30k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
@@ -290,6 +340,17 @@ def get_tokenizer_and_dataset():
 
     elif CFG.validation_type == "only17k":
         tokenizer, ds_train, ds_eval = only17k(
+            is_replace=CFG.is_replace,
+            num_split=CFG.num_split,
+            selected_fold_id=CFG.selected_fold_id,
+            backbone_model=CFG.backbone_model,
+            max_length=CFG.max_length
+        )
+
+        return tokenizer, ds_train, ds_eval
+    
+    elif CFG.validation_type == "only19k":
+        tokenizer, ds_train, ds_eval = only19k(
             is_replace=CFG.is_replace,
             num_split=CFG.num_split,
             selected_fold_id=CFG.selected_fold_id,

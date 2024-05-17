@@ -1,4 +1,7 @@
 class CFG:
+    # whether use autoclassification
+    use_autoclassification = False
+
     # you can choose from "mean_pooling", "meanmax_pooling", "attention_pooling", "weighted_layer_pooling", "concat_pooling", "lstm_pooling", "gru_pooling"
     pooling_type = "mean_pooling"
     backbone_model = "microsoft/deberta-v3-base"
@@ -11,7 +14,7 @@ class CFG:
     # replace \n\n
     is_replace = True
 
-    # cross validation, you can choose from "only4k", "only13k", "only17k", "only30k", "train17k_validation4k"
+    # cross validation, you can choose from "only4k", "only13k", "only17k", "only19k", "only30k", "train17k_validation4k"
     validation_type = "train17k_validation4k"
     num_split = 4
     selected_fold_id = 0

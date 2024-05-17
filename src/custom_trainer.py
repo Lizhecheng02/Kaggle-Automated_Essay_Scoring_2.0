@@ -1,4 +1,5 @@
 from transformers import Trainer
+from config import CFG
 import torch.nn as nn
 import torch
 import os
@@ -57,9 +58,12 @@ class CustomTrainer(Trainer):
 
         run_dir = self._get_output_dir(trial=trial)
         output_dir = os.path.join(run_dir, checkpoint_folder)
-        # self.save_model(output_dir, _internal_call=True)  # 不要保存为HuggingFace的格式
-        os.makedirs(output_dir)
-        torch.save(model.state_dict(), f"{output_dir}/model-{self.state.global_step}.pth")  # 保存为pth文件格式
+        
+        if CFG.use_autoclassification:
+            self.save_model(output_dir, _internal_call=True)  # 不要保存为HuggingFace的格式
+        else:
+            os.makedirs(output_dir)
+            torch.save(model.state_dict(), f"{output_dir}/model-{self.state.global_step}.pth")  # 保存为pth文件格式
 
         if not self.args.save_only_model:
             # Save optimizer and scheduler

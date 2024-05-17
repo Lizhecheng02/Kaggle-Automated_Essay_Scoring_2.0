@@ -1,5 +1,5 @@
 from pooling_layers import *
-from transformers import AutoModel
+from transformers import AutoModel, AutoModelForSequenceClassification
 from transformers.modeling_outputs import SequenceClassifierOutputWithPast
 from config import CFG
 import warnings
@@ -29,3 +29,16 @@ class CustomModel(nn.Module):
             hidden_states=None,
             attentions=None
         )
+
+
+def Get_AutoModel():
+    model = AutoModelForSequenceClassification(
+        CFG.backbone_model,
+        num_labels=1
+    )
+
+    if CFG.zero_dropout:
+        model.config.attention_probs_dropout_prob = 0.0
+        model.config.hidden_dropout_prob = 0.0
+
+    return model

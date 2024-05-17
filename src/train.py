@@ -1,6 +1,6 @@
 from awp_custom_trainer import AWPCustomTrainer
 from compute_metrics import compute_metrics
-from custom_model import CustomModel
+from custom_model import CustomModel, Get_AutoModel
 from custom_trainer import CustomTrainer
 # from datacollator import DataCollator
 from dataset import get_tokenizer_and_dataset
@@ -8,14 +8,17 @@ from scheduler import get_scheduler
 from training_arguments import get_training_arguments
 from wandb_init import wandb_init
 from config import CFG
-from transformers import AdamW
+from transformers import AdamW, AutoModelForSequenceClassification
 import torch
 import warnings
 warnings.filterwarnings("ignore")
 
 tokenizer, ds_train, ds_eval = get_tokenizer_and_dataset()
 
-model = CustomModel(tokenizer=tokenizer)
+if CFG.use_autoclassification:
+    model = Get_AutoModel()
+else:
+    model = CustomModel(tokenizer=tokenizer)
 print(model)
 
 wandb_init()
