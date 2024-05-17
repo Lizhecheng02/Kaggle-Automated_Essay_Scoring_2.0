@@ -16,8 +16,10 @@ train_out_of_fold = pd.read_csv(CFG.out_of_fold_file_path)
 train_out_of_fold = train_out_of_fold[:1000]
 
 train = pd.concat([train_main, train_out_of_fold], axis=0, ignore_index=True)
+train_essay_ids = train["essay_id"]
 
 test = pd.read_csv(CFG.test_file_path)
+test_essay_ids = test["essay_id"]
 
 if CFG.DO_PREPROCESS:
     print("DO_PREPROCESS!!!")
@@ -58,6 +60,9 @@ if CFG.USE_EssayProcessor:
     test = pd.concat([test, test_essay_agg_df], axis=1)
     print("The shape of test after essay processor is:", test.shape)
 
+    train["essay_id"] = train_essay_ids
+    test["essay_id"] = test_essay_ids
+
 if CFG.TRAIN_TOKENIZER:
     print("TRAIN_TOKENIZER!!!")
     tokenizer, df_train, df_test = train_tokenizer(train=train, test=test)
@@ -85,10 +90,11 @@ if CFG.USE_ORIGINAL_COUNT_VECTORIZER:
     print("The shape of test after using original count vectorizer is:", test.shape)
 
 if CFG.USE_FEEDBACK_FEATURES:
-    feedback_df_train = pd.read_csv("../dataset/train_feedback_features.csv")
+    print("USE_FEEDBACK_FEATURES!!!")
+    feedback_df_train = pd.read_csv(CFG.train_feedback_file_path)
     train = pd.merge(train, feedback_df_train, on="essay_id", how="left")
     print("The shape of train after using feedback features is:", train.shape)
-    feedback_df_test = pd.read_csv("../dataset/test_feedback_features.csv")
+    feedback_df_test = pd.read_csv(CFG.test_feedback_file_path)
     test = pd.merge(test, feedback_df_test, on="essay_id", how="left")
     print("The shape of test after using feedback features is:", test.shape)
 

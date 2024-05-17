@@ -11,12 +11,16 @@ class CFG:
     main_file_path = "../dataset/13k_overlap.csv"
     out_of_fold_file_path = "../dataset/4k_nooverlap.csv"
 
+    # use feedback features
+    train_feedback_file_path = "../dataset/train_feedback_features.csv"
+    test_feedback_file_path = "../dataset/test_feedback_features.csv"
+
     # whether to preprocess text
     DO_PREPROCESS = False
     word_file_path = "words.txt"
 
     # whether to train new tokenizer for tfidf vectorizer
-    TRAIN_TOKENIZER = True
+    TRAIN_TOKENIZER = False
 
     # whether to use original tfidf vectorizer
     USE_ORIGINAL_TFIDF_VECTORIZER = True
@@ -36,7 +40,7 @@ class CFG:
     tokenizer_training_ngram_range = (1, 3)
     tokenizer_training_min_df = 0.05
     tokenizer_training_max_df = 0.95
-    tokenizer_training_max_features = 100
+    tokenizer_training_max_features = 2000
 
     # a and b for metrics
     a = 2.998
@@ -46,13 +50,13 @@ class CFG:
     tfidf_vectorizer_ngram_range = (1, 3)
     tfidf_vectorizer_min_df = 0.05
     tfidf_vectorizer_max_df = 0.95
-    tfidf_vectorizer_max_features = 100
+    tfidf_vectorizer_max_features = 2000
 
     # count vectorizer
     count_vectorizer_ngram_range = (1, 3)
     count_vectorizer_min_df = 0.05
     count_vectorizer_max_df = 0.95
-    count_vectorizer_max_features = 100
+    count_vectorizer_max_features = 2000
 
     # parameters for lgbm
     lgbm_n_split = 5
@@ -60,9 +64,9 @@ class CFG:
     lgbm_stopping_rounds = 500
     lgbm_learning_rate = 0.005
     lgbm_n_estimators = 10000
-    lgbm_max_depth = 17
-    lgbm_num_leaves = 15
-    lgbm_reg_alpha = 0.4
-    lgbm_reg_lambda = 0.8
+    lgbm_max_depth = 12
+    lgbm_num_leaves = 20
+    lgbm_reg_alpha = 0.5
+    lgbm_reg_lambda = 0.7
     lgbm_colsample_bytree = 0.7
     lgbm_verbosity = 1
