@@ -43,29 +43,33 @@ class CFG:
     tokenizer_training_max_features = 2000
 
     # a and b for metrics
-    a = 2.998
-    b = 1.092
+    # 17k
+    # a = 2.998 
+    # b = 1.092
+    # 19k
+    a = 2.99575151546552
+    b = 0.9725680876911655
 
     # original tf-idf vectorizer
-    tfidf_vectorizer_ngram_range = (1, 3)
-    tfidf_vectorizer_min_df = 0.05
-    tfidf_vectorizer_max_df = 0.95
+    tfidf_vectorizer_ngram_range = (2, 3)
+    tfidf_vectorizer_min_df = 0.10
+    tfidf_vectorizer_max_df = 0.90
     tfidf_vectorizer_max_features = 2000
 
     # count vectorizer
-    count_vectorizer_ngram_range = (1, 3)
-    count_vectorizer_min_df = 0.05
-    count_vectorizer_max_df = 0.95
+    count_vectorizer_ngram_range = (2, 3)
+    count_vectorizer_min_df = 0.10
+    count_vectorizer_max_df = 0.90
     count_vectorizer_max_features = 2000
 
     # parameters for lgbm
     lgbm_n_split = 5
     lgbm_log_evaluation = 50
     lgbm_stopping_rounds = 500
-    lgbm_learning_rate = 0.005
-    lgbm_n_estimators = 10000
-    lgbm_max_depth = 12
-    lgbm_num_leaves = 20
+    lgbm_learning_rate = 0.01
+    lgbm_n_estimators = 3000
+    lgbm_max_depth = 8
+    lgbm_num_leaves = 10
     lgbm_reg_alpha = 0.5
     lgbm_reg_lambda = 0.7
     lgbm_colsample_bytree = 0.7
