@@ -31,11 +31,12 @@ class CustomModel(nn.Module):
         )
 
 
-def Get_AutoModel():
+def Get_AutoModel(tokenizer):
     model = AutoModelForSequenceClassification(
         CFG.backbone_model,
         num_labels=1
     )
+    model.resize_token_embeddings(len(tokenizer))
 
     if CFG.zero_dropout:
         model.config.attention_probs_dropout_prob = 0.0

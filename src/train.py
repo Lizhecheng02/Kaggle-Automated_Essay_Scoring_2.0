@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 tokenizer, ds_train, ds_eval = get_tokenizer_and_dataset()
 
 if CFG.use_autoclassification:
-    model = Get_AutoModel()
+    model = Get_AutoModel(tokenizer=tokenizer)
 else:
     model = CustomModel(tokenizer=tokenizer)
 print(model)
