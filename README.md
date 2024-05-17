@@ -22,5 +22,7 @@ export KAGGLE_KEY="your_api_key"
 cd dataset
 kaggle competitions download -c learning-agency-lab-automated-essay-scoring-2
 unzip learning-agency-lab-automated-essay-scoring-2.zip
+kaggle datasets download -d lizhecheng/aes2-0-train-dataset
+unzip aes2-0-train-dataset.zip
 ```
 
