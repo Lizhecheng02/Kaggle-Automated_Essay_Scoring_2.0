@@ -8,7 +8,10 @@ warnings.filterwarnings("ignore")
 
 
 def only4k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df = pd.read_csv("../dataset/4k_nooverlap.csv")
+    if CFG.use_rubric:
+        df = pd.read_csv("../dataset/4k_nooverlap_rubric.csv")
+    else:
+        df = pd.read_csv("../dataset/4k_nooverlap.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
@@ -58,7 +61,10 @@ def only4k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
 
 
 def only13k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df = pd.read_csv("../dataset/13k_overlap.csv")
+    if CFG.use_rubric:
+        df = pd.read_csv("../dataset/13k_overlap_rubric.csv")
+    else:
+        df = pd.read_csv("../dataset/13k_overlap.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
@@ -108,7 +114,10 @@ def only13k(is_replace, num_split, selected_fold_id, backbone_model, max_length)
 
 
 def only17k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df = pd.read_csv("../dataset/train.csv")
+    if CFG.use_rubric:
+        df = pd.read_csv("../dataset/train_rubric.csv")
+    else:
+        df = pd.read_csv("../dataset/train.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
@@ -158,7 +167,10 @@ def only17k(is_replace, num_split, selected_fold_id, backbone_model, max_length)
         
 
 def only19k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df = pd.read_csv("../dataset/19k_same_distribution.csv")
+    if CFG.use_rubric:
+        df = pd.read_csv("../dataset/19k_same_distribution_rubric.csv")
+    else:
+        df = pd.read_csv("../dataset/19k_same_distribution.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
@@ -208,7 +220,10 @@ def only19k(is_replace, num_split, selected_fold_id, backbone_model, max_length)
 
 
 def only30k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df = pd.read_csv("../dataset/30k_train.csv")
+    if CFG.use_rubric:
+        df = pd.read_csv("../dataset/30k_train_rubric.csv")
+    else:
+        df = pd.read_csv("../dataset/30k_train.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
@@ -258,8 +273,12 @@ def only30k(is_replace, num_split, selected_fold_id, backbone_model, max_length)
 
 
 def train17k_validation4k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
-    df_13k = pd.read_csv("../dataset/13k_overlap.csv")
-    df_4k = pd.read_csv("../dataset/4k_nooverlap.csv")
+    if CFG.use_rubric:
+        df_13k = pd.read_csv("../dataset/13k_overlap_rubric.csv")
+        df_4k = pd.read_csv("../dataset/4k_nooverlap_rubric.csv")
+    else:
+        df_13k = pd.read_csv("../dataset/13k_overlap.csv")
+        df_4k = pd.read_csv("../dataset/4k_nooverlap.csv")
     tokenizer = AutoTokenizer.from_pretrained(backbone_model)
 
     if is_replace:
