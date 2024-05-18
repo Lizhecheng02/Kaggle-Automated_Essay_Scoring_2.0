@@ -63,14 +63,3 @@ class CFG:
     # if you use polynomial scheduler
     power = 2.0
     lr_end = 3.0e-6
-
-    rubric = """
-    After reading an essay, assign a holistic score based on the rubric below. For the following evaluations you will need to use a grading scale between 1 (minimum) and 6(maximum). As with the analytical rating form, the distance between each grade (e.g., 1-2, 3-4, 4-5) should beconsidered equal.
-    Score of 6 (Excellent): 1)Consistently shows strong understanding of the topic. 2)Excellent critical thinking and persuasive arguments. 3)Very well organized, clear flow of ideas. 4)Strong vocabulary, varied sentences, with no major errors.
-    Score of 5 (Good): 1)Shows understanding of the topic. 2)Good critical thinking, with solid arguments. 3)Well organized with a mostly logical flow. 4)Good vocabulary and sentence structure with few errors.
-    Score of 4 (Adequate): 1)Demonstrates basic understanding. 2)Some critical thinking, but arguments need strengthening. 3)Mostly organized, but could have better idea flow. 4)Decent vocabulary, sentences may lack variety, some errors present.
-    Score of 3 (Needs Improvement): 1)Limited understanding of the topic. 2)Inconsistent critical thinking, weak arguments. 3)Needs better organization and smoother flow of ideas. 4)Weak vocabulary, may have sentence structure issues, several errors.
-    Score of 2 (Poor): 1)Very limited understanding. 2)Minimal critical thinking, lacks strong arguments. 3)Poor organization and confusing flow of ideas. 4)Very simple vocabulary, incorrect word choices, serious sentence errors.
-    Score of 1 (Unsatisfactory): 1)Fails to demonstrate understanding. 2)No clear point of view and very weak arguments. 3)Incoherent structure. 4)Extremely limited vocabulary, severe sentence structure problems, and major errors that make the essay hard to understand.
-    The essay is:
-    """

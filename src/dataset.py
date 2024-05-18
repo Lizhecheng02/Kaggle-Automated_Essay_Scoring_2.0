@@ -334,6 +334,68 @@ def train17k_validation4k(is_replace, num_split, selected_fold_id, backbone_mode
             return tokenizer, ds_train, ds_eval
 
 
+def train19k_validation4k(is_replace, num_split, selected_fold_id, backbone_model, max_length):
+    if CFG.use_rubric:
+        df_14k = pd.read_csv("../dataset/df_14k_same_distribution_4k_rubric.csv")
+        df_4k = pd.read_csv("../dataset/4k_nooverlap_rubric.csv")
+    else:
+        df_14k = pd.read_csv("../dataset/df_14k_same_distribution_4k.csv")
+        df_4k = pd.read_csv("../dataset/4k_nooverlap.csv")
+    tokenizer = AutoTokenizer.from_pretrained(backbone_model)
+
+    if is_replace:
+        df_14k["full_text"] = df_14k["full_text"].str.replace(
+            r'\n\n', "[PARAGRAPH]", regex=True
+        )
+        df_4k["full_text"] = df_4k["full_text"].str.replace(
+            r'\n\n', "[PARAGRAPH]", regex=True
+        )
+        tokenizer.add_special_tokens(
+            {"additional_special_tokens": ["[PARAGRAPH]"]}
+        )
+
+    df_14k["labels"] = df_14k.score.map(lambda x: x)
+    df_14k["labels"] = df_14k["labels"].astype(float)
+
+    df_4k["labels"] = df_4k.score.map(lambda x: x)
+    df_4k["labels"] = df_4k["labels"].astype(float)
+    X_4k = df_4k[["essay_id", "full_text", "score"]]
+    y_4k = df_4k[["labels"]]
+
+    skf = StratifiedKFold(n_splits=num_split, random_state=3047, shuffle=True)
+    print(len(tokenizer))
+
+    def tokenize(sample):
+        return tokenizer(sample["full_text"], max_length=max_length, truncation=True)
+
+    for fold_id, (train_index, val_index) in enumerate(skf.split(X_4k, y_4k)):
+        if fold_id == selected_fold_id:
+            print(f"... Fold {fold_id} ...")
+            X_train, X_eval = X_4k.iloc[train_index], X_4k.iloc[val_index]
+            y_train, y_eval = y_4k.iloc[train_index], y_4k.iloc[val_index]
+
+            df_train = pd.concat([X_train, y_train], axis=1)
+            df_train = pd.concat([df_train, df_14k], axis=0)
+            df_train.reset_index(drop=True, inplace=True)
+            print(df_train["labels"].value_counts())
+
+            df_eval = pd.concat([X_eval, y_eval], axis=1)
+            df_eval.reset_index(drop=True, inplace=True)
+            print(df_eval["labels"].value_counts())
+
+            ds_train = Dataset.from_pandas(df_train)
+            ds_eval = Dataset.from_pandas(df_eval)
+
+            ds_train = ds_train.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+            ds_eval = ds_eval.map(tokenize).remove_columns(
+                ["essay_id", "full_text", "score"]
+            )
+
+            return tokenizer, ds_train, ds_eval
+
+
 def get_tokenizer_and_dataset():
     if CFG.validation_type == "only4k":
         tokenizer, ds_train, ds_eval = only4k(
@@ -400,3 +462,17 @@ def get_tokenizer_and_dataset():
         )
 
         return tokenizer, ds_train, ds_eval
+    
+    elif CFG.validation_type == "train19k_validation4k":
+        tokenizer, ds_train, ds_eval = train19k_validation4k(
+            is_replace=CFG.is_replace,
+            num_split=CFG.num_split,
+            selected_fold_id=CFG.selected_fold_id,
+            backbone_model=CFG.backbone_model,
+            max_length=CFG.max_length
+        )
+
+        return tokenizer, ds_train, ds_eval
+    
+    else:
+        raise ValueError(f"Invalid Validation Type: {CFG.validation_type}")
