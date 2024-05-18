@@ -11,6 +11,10 @@ class CFG:
     # regression
     zero_dropout = True
 
+    # initialization parameters
+    use_initialization = True
+    initializer_range = 1.0
+
     # whether to use rubric
     use_rubric = True
 
