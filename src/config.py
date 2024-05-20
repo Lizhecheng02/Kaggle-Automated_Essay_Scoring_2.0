@@ -55,7 +55,7 @@ class CFG:
     per_device_train_batch_size = 2
     per_device_eval_batch_size = per_device_train_batch_size * 2
     gradient_accumulation_steps = 16 // per_device_train_batch_size
-    num_train_epochs = 3
+    num_train_epochs = 4
     weight_decay = 0.001
     steps = 100
     save_total_limit = 5
