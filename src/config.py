@@ -42,16 +42,16 @@ class CFG:
     bidirectional = True
 
     # awp
-    # train_type = "awp"
+    train_type = "awp"
     awp_lr = 0.1
     awp_eps = 1.0e-4
     awp_start_epoch = 1.0
 
     # no awp
-    train_type = "no-awp"
+    # train_type = "no-awp"
 
     # training_arguments
-    learning_rate = 2.0e-5
+    learning_rate = 3.0e-5
     per_device_train_batch_size = 2
     per_device_eval_batch_size = per_device_train_batch_size * 2
     gradient_accumulation_steps = 16 // per_device_train_batch_size
