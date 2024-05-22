@@ -1,12 +1,21 @@
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from config import CFG
 import pandas as pd
+import pickle
+
+
+def tokenizer(x):
+    return x
+
+
+def preprocessor(x):
+    return x
 
 
 def use_tf_idf_vectorizer(train):
     vectorizer = TfidfVectorizer(
-        tokenizer=lambda x: x,
-        preprocessor=lambda x: x,
+        tokenizer=tokenizer,
+        preprocessor=preprocessor,
         token_pattern=None,
         strip_accents="unicode",
         analyzer="word",
@@ -23,13 +32,17 @@ def use_tf_idf_vectorizer(train):
     tfidf_columns = [f"tfidf_{i}" for i in range(len(df.columns))]
     df.columns = tfidf_columns
     df["essay_id"] = train["essay_id"]
+
+    with open("tf_idf_vectorizer.pkl", "wb") as f:
+        pickle.dump(vectorizer, f)
+
     return vectorizer, df
 
 
 def use_count_vectorizer(train):
     vectorizer = CountVectorizer(
-        tokenizer=lambda x: x,
-        preprocessor=lambda x: x,
+        tokenizer=tokenizer,
+        preprocessor=preprocessor,
         token_pattern=None,
         strip_accents="unicode",
         analyzer="word",
@@ -37,12 +50,17 @@ def use_count_vectorizer(train):
         min_df=CFG.count_vectorizer_min_df,
         max_df=CFG.count_vectorizer_max_df,
     )
+
     X_train = vectorizer.fit_transform([i for i in train["full_text"]])
     dense_matrix = X_train.toarray()
     df = pd.DataFrame(dense_matrix)
     count_columns = [f"count_{i}" for i in range(len(df.columns))]
     df.columns = count_columns
     df["essay_id"] = train["essay_id"]
+
+    with open("count_vectorizer.pkl", "wb") as f:
+        pickle.dump(vectorizer, f)
+
     return vectorizer, df
 
 
