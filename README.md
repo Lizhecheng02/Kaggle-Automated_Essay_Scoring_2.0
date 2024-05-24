@@ -20,7 +20,7 @@ export KAGGLE_KEY="your_api_key"
 #### 2. Install unzip
 
 ```bash
-sudo install unzip
+sudo apt install unzip
 ```
 
 #### 2. Download Dataset
