@@ -17,6 +17,12 @@ export KAGGLE_USERNAME="your_kaggle_username"
 export KAGGLE_KEY="your_api_key"
 ```
 
+#### 2. Install unzip
+
+```bash
+sudo install unzip
+```
+
 #### 2. Download Dataset
 ```bash
 cd dataset
