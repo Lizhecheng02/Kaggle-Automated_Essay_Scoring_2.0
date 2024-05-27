@@ -7,6 +7,7 @@ from preprocess import essay_preprocess
 from vectorizers import *
 from essay_processor import EssayProcessor
 from lgbm_train import train_lgbm_out_of_fold
+from xgb_train import train_xgb_out_of_fold
 warnings.filterwarnings("ignore")
 
 train_main = pd.read_csv(CFG.main_file_path)
@@ -120,3 +121,5 @@ print("The shape of final X_train_out_of_fold is:", X_train_out_of_fold.shape)
 gc.collect()
 
 lgbm_models, lgbm_model_nums, lgbm_predictions = train_lgbm_out_of_fold(X_train_main=X_train_main, X_train_out_of_fold=X_train_out_of_fold, X_test=test)
+
+xgb_models, xgb_model_nums, xgb_predictions = train_xgb_out_of_fold(X_train_main=X_train_main, X_train_out_of_fold=X_train_out_of_fold, X_test=test)

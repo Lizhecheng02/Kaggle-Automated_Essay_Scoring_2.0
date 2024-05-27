@@ -7,6 +7,7 @@ from preprocess import essay_preprocess
 from vectorizers import *
 from essay_processor import EssayProcessor
 from lgbm_train import train_lgbm
+from xgb_train import train_xgb
 warnings.filterwarnings("ignore")
 
 train = pd.read_csv(CFG.train_file_path)
@@ -108,4 +109,6 @@ print("The shape of final test is:", test.shape)
 
 gc.collect()
 
-lgbm_models, lgbm_model_nums, lgbm_predictions = train_lgbm(X_train=train, X_test=test)
+# lgbm_models, lgbm_model_nums, lgbm_predictions = train_lgbm(X_train=train, X_test=test)
+
+xgb_models, xgb_model_nums, xgb_predictions = train_xgb(X_train=train, X_test=test)
