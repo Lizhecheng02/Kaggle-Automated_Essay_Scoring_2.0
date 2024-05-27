@@ -1,15 +1,21 @@
 import numpy as np
+import xgboost as xgb
 from sklearn.metrics import accuracy_score, cohen_kappa_score
 from config import CFG
 
 
 def quadratic_weighted_kappa(y_true, y_pred):
-    y_true = (y_true + CFG.a).clip(1, 6).round()
-    y_pred = (y_pred + CFG.a).clip(1, 6).round()
-    # print(y_true)
-    # print(y_pred)
-    qwk = cohen_kappa_score(y_true, y_pred, weights="quadratic")
-    return "QWK", qwk, True
+    if isinstance(y_pred, xgb.QuantileDMatrix):
+        y_true, y_pred = y_pred, y_true
+        y_true = (y_true.get_label() + CFG.a).round()
+        y_pred = (y_pred + CFG.a).clip(1, 6).round()
+        qwk = cohen_kappa_score(y_true, y_pred, weights="quadratic")
+        return "QWK", qwk
+    else:
+        y_true = (y_true + CFG.a).round()
+        y_pred = (y_pred + CFG.a).clip(1, 6).round()
+        qwk = cohen_kappa_score(y_true, y_pred, weights="quadratic")
+        return "QWK", qwk, True
 
 
 def qwk_obj(y_true, y_pred):
