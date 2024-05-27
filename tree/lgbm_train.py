@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import warnings
 import lightgbm as lgb
+import torch
 from metrics import qwk_obj, quadratic_weighted_kappa
 from lightgbm import log_evaluation, early_stopping
 from tqdm import tqdm
@@ -29,13 +30,6 @@ def train_lgbm(X_train, X_test):
         shuffle=True
     )
 
-    callbacks = [
-        log_evaluation(period=CFG.lgbm_log_evaluation),
-        early_stopping(
-            stopping_rounds=CFG.lgbm_stopping_rounds,
-            first_metric_only=True
-        )
-    ]
     for fold_id, (train_idx, val_idx) in tqdm(enumerate(skf.split(X.copy(), y.copy().astype(str))), total=5):
         model = lgb.LGBMRegressor(
             objective=qwk_obj,
@@ -48,12 +42,21 @@ def train_lgbm(X_train, X_test):
             reg_lambda=CFG.lgbm_reg_lambda,
             colsample_bytree=CFG.lgbm_colsample_bytree,
             random_state=CFG.random_state,
-            verbosity=CFG.lgbm_verbosity
+            verbosity=CFG.lgbm_verbosity,
+            device="gpu" if torch.cuda.is_available() else "cpu"
         )
         X_train_tmp = X_train.iloc[train_idx][feature_names]
         y_train_tmp = X_train.iloc[train_idx]["score"] - CFG.a
         X_val_tmp = X_train.iloc[val_idx][feature_names]
         y_val_tmp = X_train.iloc[val_idx]["score"] - CFG.a
+
+        callbacks = [
+            log_evaluation(period=CFG.lgbm_log_evaluation),
+            early_stopping(
+                stopping_rounds=CFG.lgbm_stopping_rounds,
+                first_metric_only=True
+            )
+        ]
 
         print("\n==== Fold_{} Training ====\n".format(fold_id + 1))
         lgb_model = model.fit(
@@ -73,7 +76,7 @@ def train_lgbm(X_train, X_test):
         df_tmp["pred"] = pred_val + CFG.a
 
         oof.append(df_tmp)
-        models.append(model.booster_)
+        models.append(lgb_model.booster_)
         lgb_model.booster_.save_model(f"lgbm/fold_{fold_id}.txt")
 
     df_oof = pd.concat(oof)
@@ -120,13 +123,6 @@ def train_lgbm_out_of_fold(X_train_main, X_train_out_of_fold, X_test):
         shuffle=True
     )
 
-    callbacks = [
-        log_evaluation(period=CFG.lgbm_log_evaluation),
-        early_stopping(
-            stopping_rounds=CFG.lgbm_stopping_rounds,
-            first_metric_only=True
-        )
-    ]
     for fold_id, (train_idx, val_idx) in tqdm(enumerate(skf.split(X_out_of_fold.copy(), y_out_of_fold.copy().astype(str))), total=5):
         model = lgb.LGBMRegressor(
             objective=qwk_obj,
@@ -139,7 +135,8 @@ def train_lgbm_out_of_fold(X_train_main, X_train_out_of_fold, X_test):
             reg_lambda=CFG.lgbm_reg_lambda,
             colsample_bytree=CFG.lgbm_colsample_bytree,
             random_state=CFG.random_state,
-            verbosity=CFG.lgbm_verbosity
+            verbosity=CFG.lgbm_verbosity,
+            device="gpu" if torch.cuda.is_available() else "cpu"
         )
         X_train_tmp = X_train_out_of_fold.iloc[train_idx][feature_names]
         y_train_tmp = X_train_out_of_fold.iloc[train_idx]["score"] - CFG.a
@@ -151,6 +148,14 @@ def train_lgbm_out_of_fold(X_train_main, X_train_out_of_fold, X_test):
 
         X_val_tmp = X_train_out_of_fold.iloc[val_idx][feature_names]
         y_val_tmp = X_train_out_of_fold.iloc[val_idx]["score"] - CFG.a
+
+        callbacks = [
+            log_evaluation(period=CFG.lgbm_log_evaluation),
+            early_stopping(
+                stopping_rounds=CFG.lgbm_stopping_rounds,
+                first_metric_only=True
+            )
+        ]
 
         print("\n==== Fold_{} Training ====\n".format(fold_id + 1))
         lgb_model = model.fit(
@@ -170,7 +175,7 @@ def train_lgbm_out_of_fold(X_train_main, X_train_out_of_fold, X_test):
         df_tmp["pred"] = pred_val + CFG.a
 
         oof.append(df_tmp)
-        models.append(model.booster_)
+        models.append(lgb_model.booster_)
         lgb_model.booster_.save_model(f"lgbm/fold_{fold_id}.txt")
 
     df_oof = pd.concat(oof)
