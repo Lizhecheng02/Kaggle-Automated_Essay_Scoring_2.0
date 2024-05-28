@@ -96,7 +96,7 @@ def train_xgb(X_train, X_test):
     for i in range(CFG.xgb_n_split - 1):
         pred_now = models[i + 1].predict(X_test[feature_names]) + CFG.a
         pred_test = np.add(pred_test, pred_now)
-    pred_test = pred_test / 5.0
+    pred_test = pred_test / CFG.xgb_n_split
     pred_test = pred_test.clip(1, 6).round()
     print(pred_test)
 
@@ -197,7 +197,7 @@ def train_xgb_out_of_fold(X_train_main, X_train_out_of_fold, X_test):
     for i in range(CFG.xgb_n_split - 1):
         pred_now = models[i + 1].predict(X_test[feature_names]) + CFG.a
         pred_test = np.add(pred_test, pred_now)
-    pred_test = pred_test / 5.0
+    pred_test = pred_test / CFG.xgb_n_split
     pred_test = pred_test.clip(1, 6).round()
     print(pred_test)
 
