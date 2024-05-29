@@ -2,7 +2,7 @@ import gc
 import pandas as pd
 import numpy as np
 import warnings
-import lightgbm as lgb
+import xgboost as xgb
 from config import CFG
 from preprocess import essay_preprocess
 from vectorizers import *
@@ -78,9 +78,11 @@ print("The shape of final test is:", test.shape)
 gc.collect()
 
 all_preds = []
-for fold_id in range(CFG.lgbm_n_split):
+test = xgb.DMatrix(test)
+for fold_id in range(CFG.xgb_n_split):
     print(f"=========== fold_{fold_id} ============")
-    model = lgb.Booster(model_file=f"lgbm/fold_{fold_id}.txt")
+    model = xgb.Booster({"nthread": 4})
+    model.load_model(f"xgb/fold_{fold_id}.model")
     y_pred = model.predict(test)
     all_preds.append(y_pred)
     print(y_pred)
