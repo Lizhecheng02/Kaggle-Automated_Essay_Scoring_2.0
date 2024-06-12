@@ -153,7 +153,29 @@ class WeightedLayerPooling(nn.Module):
         weight_factor = self.layer_weights.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).expand(all_layer_embedding.size())
         weighted_average = (weight_factor * all_layer_embedding).sum(dim=0) / self.layer_weights.sum()
         return weighted_average[:, 0]
+    
 
+class MaxPooling(nn.Module):
+        def __init__(self, backbone_model):
+            super(MaxPooling, self).__init__()
+            self.output_dim = AutoConfig.from_pretrained(backbone_model).hidden_size
+
+        def forward(self, inputs, backbone_outputs):
+            last_hidden_state = get_last_hidden_state(backbone_outputs)
+            _, max_pooling_embeddings = torch.max(last_hidden_state, 1)
+            return max_pooling_embeddings
+
+
+class MinPooling(nn.Module):
+        def __init__(self, backbone_model):
+            super(MinPooling, self).__init__()
+            self.output_dim = AutoConfig.from_pretrained(backbone_model).hidden_size
+
+        def forward(self, inputs, backbone_outputs):
+            last_hidden_state = get_last_hidden_state(backbone_outputs)
+            _, min_pooling_embeddings = torch.min(last_hidden_state, 1)
+            return min_pooling_embeddings
+        
 
 def get_pooling_layer():
     if CFG.pooling_type == "mean_pooling":
@@ -199,6 +221,12 @@ def get_pooling_layer():
             bidirectional=CFG.bidirectional,
             is_lstm=False
         )
+    
+    elif CFG.pooling_type == "max_pooling":
+        return MaxPooling(backbone_model=CFG.backbone_model)
+    
+    elif CFG.pooling_type == "min_pooling":
+        return MinPooling(backbone_model=CFG.backbone_model)
 
     else:
         raise ValueError(f"Invalid Pooling Type: {CFG.pooling_type}")
