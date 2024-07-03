@@ -73,16 +73,23 @@ chmod +x ./regression.sh
 ```
 
 ### Run Tree Models
-
 ```bash
 cd tree
 (change the settings in config.py)
 python full_cv_main.py / python out_of_fold_cv_main.py
 ```
 
-### Conclusion 
+### Some Tricks (Replace "\n\n" ...)
+```bash
+cd replace
+chmod +x ./regression.sh
+./regression.sh
+```
+You can also combine tricks into the codes under **src** directory 
 
+
+### Conclusion 
 #### 1. It is very important to use a tree model as a two-stage correction in this competition.
-#### 2. You don't need to submit in the Learning Agency Lab competition during the last month.
+#### 2. You don't need to submit your entry for the Learning Agency Lab competition in the final month.
 #### 3. A meaningless competition, a meaningless bronze medal.
 
