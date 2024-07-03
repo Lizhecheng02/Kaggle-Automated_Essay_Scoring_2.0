@@ -32,3 +32,57 @@ kaggle datasets download -d lizhecheng/aes2-0-train-dataset
 unzip aes2-0-train-dataset.zip
 ```
 
+### Run Deberta Regression
+
+#### 1. If you want to run with specific pooling method (no awp)
+```bash
+cd deberta
+cd xxxPooling
+chmod +x ./regression.sh
+./regression.sh
+```
+#### 2. If you want to run with specific pooling method (awp)
+```bash
+cd deberta-awp
+cd xxxPooling
+chmod +x ./regression.sh
+./regression.sh
+```
+
+#### 3. If you want the flexibility to set the parameters of the model
+```bash
+cd src
+(change the settings in config.py)
+python train.py
+```
+
+### Run LLM
+
+#### 1. Classification
+```bash
+cd llm
+chmod +x ./classification.sh
+./classification.sh
+```
+
+#### 2. Regression
+```bash
+cd llm
+chmod +x ./regression.sh
+./regression.sh
+```
+
+### Run Tree Models
+
+```bash
+cd tree
+(change the settings in config.py)
+python full_cv_main.py / python out_of_fold_cv_main.py
+```
+
+### Conclusion 
+
+#### 1. It is very important to use a tree model as a two-stage correction in this competition.
+#### 2. You don't need to submit in the Learning Agency Lab competition during the last month.
+#### 3. A meaningless competition, a meaningless bronze medal.
+
